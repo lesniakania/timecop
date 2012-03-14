@@ -79,14 +79,14 @@ class Timecop
       def parse_time(*args)
         arg = args.shift
         if arg.is_a?(Time)
-          arg.getlocal
+          arg.utc
         elsif Object.const_defined?(:DateTime) && arg.is_a?(DateTime)
           offset_difference = Time.now.utc_offset - rational_to_utc_offset(arg.offset)
-          Time.local(arg.year, arg.month, arg.day, arg.hour, arg.min, arg.sec) + offset_difference
+          Time.utc(arg.year, arg.month, arg.day, arg.hour, arg.min, arg.sec, arg.zone) + offset_difference
         elsif Object.const_defined?(:Date) && arg.is_a?(Date)
-          Time.local(arg.year, arg.month, arg.day, 0, 0, 0)
+          Time.utc(arg.year, arg.month, arg.day, 0, 0, 0, arg.zone)
         elsif args.empty? && arg.kind_of?(Integer)
-          Time.now + arg
+          Time.now.utc + arg
         else # we'll just assume it's a list of y/m/d/h/m/s
           year   = arg        || 0
           month  = args.shift || 1
@@ -94,7 +94,8 @@ class Timecop
           hour   = args.shift || 0
           minute = args.shift || 0
           second = args.shift || 0
-          Time.local(year, month, day, hour, minute, second)
+          zone   = args.shift || 0
+          Time.utc(year, month, day, hour, minute, second, zone)
         end
       end
       
